@@ -56,11 +56,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="dllmain.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,9 +99,6 @@
       <Filter>minirtl</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\windefend.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pca.c">

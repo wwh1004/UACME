@@ -271,10 +271,6 @@ VOID WINAPI pcaEntryPointLoader(
     LPCWSTR lpCmdline = GetCommandLine();
     WCHAR szLoaderParam[MAX_PATH + 1];
 
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
-
     RtlSecureZeroMemory(szLoaderParam, sizeof(szLoaderParam));
     GetCommandLineParam(lpCmdline, 0, (LPWSTR)&szLoaderParam, MAX_PATH, &rLen);
 
@@ -293,7 +289,7 @@ VOID WINAPI pcaEntryPointLoader(
         ucmDbgMsg(L"[PCALDR] Empty command line\r\n");
     }
 
-    RtlExitUserProcess(status);
+    ExitProcess(status);
 }
 
 /*
@@ -335,13 +331,9 @@ BOOL WINAPI pcaEntryPointDll(
 
     UNREFERENCED_PARAMETER(lpvReserved);
 
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('f0ff');
-    }
-
     if (fdwReason == DLL_PROCESS_ATTACH) {
 
-        LdrDisableThreadCalloutsForDll(hinstDLL);
+        DisableThreadLibraryCalls(hinstDLL);
 
         ucmDbgMsg(L"[PCADLL] Entry\r\n");
 

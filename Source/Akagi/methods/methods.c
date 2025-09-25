@@ -290,17 +290,12 @@ NTSTATUS MethodsManagerCall(
 {
     BOOL        bParametersBlockSet = FALSE;
     NTSTATUS    MethodResult, Status;
-    ULONG       PayloadSize = 0, DataSize = 0;
-    PVOID       PayloadCode = NULL, Resource = NULL;
-    PVOID       ImageBaseAddress = g_hInstance;
+    ULONG       PayloadSize = 0;
+    PVOID       PayloadCode = NULL;
 
     PUCM_API_DISPATCH_ENTRY Entry;
 
     UCM_PARAMS_BLOCK ParamsBlock;
-
-    if (wdIsEmulatorPresent3()) {
-        return STATUS_NOT_SUPPORTED;
-    }
 
     if (Method >= UacMethodMax) {
         return STATUS_INVALID_PARAMETER;
@@ -331,23 +326,13 @@ NTSTATUS MethodsManagerCall(
 
         Status = supLdrQueryResourceDataEx(
             Entry->PayloadResourceId,
-            ImageBaseAddress,
-            &DataSize,
-            &Resource);
+            &PayloadSize,
+            &PayloadCode);
 
         if (!NT_SUCCESS(Status)) {
 
-            if (Status == STATUS_RESOURCE_TYPE_NOT_FOUND)
-                return STATUS_INVALID_IMAGE_FORMAT;
-
             return Status;
         }
-
-        if (DataSize == 0 || Resource == NULL) {
-            return STATUS_INVALID_IMAGE_FORMAT;
-        }
-
-        PayloadCode = g_ctx->DecompressRoutine(Entry->PayloadResourceId, Resource, DataSize, &PayloadSize);
 
         if ((PayloadCode == NULL) || (PayloadSize == 0)) {
             return STATUS_DATA_ERROR;

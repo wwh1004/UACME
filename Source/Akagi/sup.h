@@ -188,13 +188,11 @@ BOOLEAN supSetCheckSumForMappedFile(
 
 NTSTATUS supLdrQueryResourceDataEx(
     _In_ ULONG_PTR ResourceId,
-    _In_ PVOID DllHandle,
     _Out_ PULONG DataSize,
     _Out_ PVOID* Data);
 
 PBYTE supLdrQueryResourceData(
     _In_ ULONG_PTR ResourceId,
-    _In_ PVOID DllHandle,
     _Out_ PULONG DataSize);
 
 VOID supMasqueradeProcess(
@@ -341,8 +339,7 @@ VOID supDestroySharedParametersBlock(
 PVOID supCreateUacmeContext(
     _In_ ULONG Method,
     _In_reads_or_z_opt_(OptionalParameterLength) LPWSTR OptionalParameter,
-    _In_ ULONG OptionalParameterLength,
-    _In_ PVOID DecompressRoutine);
+    _In_ ULONG OptionalParameterLength);
 
 VOID supDestroyUacmeContext(
     _In_ PVOID Context);

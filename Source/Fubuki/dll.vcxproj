@@ -77,6 +77,9 @@
     <CharacterSet>Unicode</CharacterSet>
     <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -345,7 +348,6 @@
     <ClCompile Include="..\Shared\ultohex.c" />
     <ClCompile Include="..\Shared\ultostr.c" />
     <ClCompile Include="..\Shared\util.c" />
-    <ClCompile Include="..\Shared\windefend.c" />
     <ClCompile Include="..\Shared\_filename.c" />
     <ClCompile Include="..\shared\_strcat.c" />
     <ClCompile Include="..\Shared\_strcmpi.c" />
@@ -371,9 +373,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="uihacks.h" />
     <ClInclude Include="winmm.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export.def" />

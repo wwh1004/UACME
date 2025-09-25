@@ -1,3 +1,4 @@
+LIBRARY ppiext1
 EXPORTS
 Wow64LogSystemService   = DummyFunc
 Wow64LogInitialize      = DummyFunc

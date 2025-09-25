@@ -19,12 +19,6 @@
 
 #pragma once
 
-VOID ConsoleInit(
-    VOID);
-
-VOID ConsoleRelease(
-    VOID);
-
 VOID ConsolePrintStatus(
     _In_ LPCWSTR Message,
     _In_ NTSTATUS Status);
@@ -37,16 +31,6 @@ VOID ConsolePrintValueUlong(
     _In_ ULONG Value,
     _In_ BOOL Hexademical);
 
-#ifdef _UCM_CONSOLE
-#define ucmConsoleInit ConsoleInit
-#define ucmConsoleRelease ConsoleRelease
 #define ucmConsolePrintStatus ConsolePrintStatus
 #define ucmConsolePrint ConsolePrint
 #define ucmConsolePrintValueUlong ConsolePrintValueUlong
-#else
-#define ucmConsoleInit()
-#define ucmConsoleRelease()
-#define ucmConsolePrintStatus(Message, Status)
-#define ucmConsolePrint(Message)
-#define ucmConsolePrintValueUlong(Message, Value, Hexademical)
-#endif

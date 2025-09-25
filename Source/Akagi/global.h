@@ -114,9 +114,7 @@ typedef struct _UACME_CONTEXT {
     ULONG                   OptionalParameterLength; 
 
     PVOID                   ucmHeap;
-    pfnDecompressPayload    DecompressRoutine;
-    pswprintf_s             swprintf_s;
-    
+
     UACME_FUSION_CONTEXT    FusionContext;
     UACME_SHARED_CONTEXT    SharedContext;
 
@@ -164,4 +162,3 @@ typedef struct _UACME_THREAD_CONTEXT {
 } UACME_THREAD_CONTEXT, * PUACME_THREAD_CONTEXT;
 
 extern PUACMECONTEXT g_ctx;
-extern HINSTANCE g_hInstance;

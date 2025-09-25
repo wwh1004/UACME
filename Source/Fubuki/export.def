@@ -1,3 +1,4 @@
+LIBRARY ppiext2
 EXPORTS
 ;DllRegisterServer           = DummyFunc PRIVATE
 
@@ -11,15 +12,15 @@ Wow64LogMessageArgList		= DummyFunc
 TaskDialogIndirect          = DummyFunc @345
 
 ; Main routines
-MpManagerOpen               = UiAccessMethodDllMain
-MpHandleClose               = UiAccessMethodHookProc
-MpScanStart                 = EntryPointExeMode
-MpScanControl               = EntryPointUIAccessLoader
-MpUpdateEngine              = EntryPointUIAccessLoader2
-MpThreatOpen                = EntryPointSxsConsent
-MpThreatEnumerate           = EntryPointBackupLocked
-MpManagerStatusQuery        = pcaEntryPointLoader
-MpManagerStatusQueryEx      = pcaEntryPointDll
+PpiExtV2Open                = UiAccessMethodDllMain
+PpiExtV2Close               = UiAccessMethodHookProc
+PpiExtV2Start               = EntryPointExeMode
+PpiExtV2Control             = EntryPointUIAccessLoader
+PpiExtV2Engine              = EntryPointUIAccessLoader2
+PpiExtV2Reopen              = EntryPointSxsConsent
+PpiExtV2Enumerate           = EntryPointBackupLocked
+PpiExtV2Query			    = pcaEntryPointLoader
+PpiExtV2QueryEx             = pcaEntryPointDll
 
 ; MSCOREE.DLL
 ClrCreateManagedInstance    = DummyFunc

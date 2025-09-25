@@ -82,14 +82,6 @@ VOID DefaultPayload(
     }
 
     //
-    // If this is default executable, show runtime info.
-    //
-    if ((lpParameter == NULL) || (cbParameter == 0)) {
-        if (g_SharedParams.AkagiFlag == AKAGI_FLAG_TANGO)
-            ucmQueryRuntimeInfo(FALSE);
-    }
-
-    //
     // Notify Akagi.
     //
     if (bSharedParamsReadOk) {
@@ -97,7 +89,7 @@ VOID DefaultPayload(
         ucmSetCompletion(g_SharedParams.szSignalObject);
     }
 
-    RtlExitUserProcess(ExitCode);
+    ExitProcess(ExitCode);
 }
 
 /*
@@ -165,7 +157,7 @@ VOID UiAccessMethodPayload(
                     UnhookWindowsHookEx(hHook);
                 }
             }
-            RtlExitUserProcess(0);
+            ExitProcess(0);
         }
     }
 
@@ -207,10 +199,6 @@ BOOL WINAPI UiAccessMethodDllMain(
     WCHAR szMMC[] = { L'm', L'm', L'c', L'.', L'e', L'x', L'e', 0 };
     UNREFERENCED_PARAMETER(lpvReserved);
 
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
-
     if (fdwReason == DLL_PROCESS_ATTACH) {
         UiAccessMethodPayload(hinstDLL, TRUE, szMMC);
     }
@@ -234,10 +222,6 @@ BOOL WINAPI DllMain(
 {
     UNREFERENCED_PARAMETER(hinstDLL);
     UNREFERENCED_PARAMETER(lpvReserved);
-   
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
         DefaultPayload();
@@ -258,9 +242,6 @@ VOID WINAPI EntryPointExeMode(
     VOID
 )
 {
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
     DefaultPayload();
 }
 
@@ -279,16 +260,12 @@ VOID WINAPI EntryPointUIAccessLoader(
     ULONG r = 0;
     WCHAR szParam[MAX_PATH * 2];
 
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
-
     if (GetCommandLineParam(GetCommandLine(), 0, szParam, MAX_PATH, &r)) {
         if (r > 0) {
             ucmUIHackExecute(szParam);
         }
     }
-    RtlExitUserProcess(0);
+    ExitProcess(0);
 }
 
 /*
@@ -303,12 +280,9 @@ VOID WINAPI EntryPointUIAccessLoader2(
     VOID
 )
 {
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED) {
-        RtlExitUserProcess('foff');
-    }
     ucmUIHackExecute2();
     
-    RtlExitUserProcess(0);
+    ExitProcess(0);
 }
 
 /*
@@ -333,13 +307,9 @@ BOOL WINAPI EntryPointSxsConsent(
 
     ucmDbgMsg(LoadedMsg);
 
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED)
-        RtlExitUserProcess('foff');
-
-
     if (fdwReason == DLL_PROCESS_ATTACH) {
 
-        LdrDisableThreadCalloutsForDll(hinstDLL);
+        DisableThreadLibraryCalls(hinstDLL);
 
         //
         // Read shared params block.
@@ -392,9 +362,6 @@ BOOL WINAPI EntryPointBackupLocked(
     UNREFERENCED_PARAMETER(lpvReserved);
 
     ucmDbgMsg(LoadedMsg);
-
-    if (wdIsEmulatorPresent() != STATUS_NOT_SUPPORTED)
-        RtlExitUserProcess('foff');
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
 

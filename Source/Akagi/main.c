@@ -23,9 +23,6 @@
 //Runtime context global variable
 PUACMECONTEXT g_ctx;
 
-//Image Base Address global variable
-HINSTANCE g_hInstance;
-
 /*
 * ucmInit
 *
@@ -55,10 +52,6 @@ NTSTATUS ucmInit(
     ULONG bytesIO;
     WCHAR szBuffer[MAX_PATH + 1];
 
-    wdCheckEmulatedVFS();
-
-    ucmConsoleInit();
-
     bytesIO = 0;
     RtlQueryElevationFlags(&bytesIO);
     if ((bytesIO & DBG_FLAG_ELEVATION_ENABLED) == 0)
@@ -68,9 +61,6 @@ NTSTATUS ucmInit(
         return STATUS_INTERNAL_ERROR;
 
     InitCommonControls();
-
-    if (g_hInstance == NULL)
-        g_hInstance = (HINSTANCE)NtCurrentPeb()->ImageBaseAddress;
 
     if (*RunMethod == UacMethodInvalid) {
 
@@ -129,8 +119,7 @@ NTSTATUS ucmInit(
 
     g_ctx = (PUACMECONTEXT)supCreateUacmeContext(Method,
         optionalParameter,
-        optionalParameterLength,
-        supEncodePointer(DecompressPayload));
+        optionalParameterLength);
 
     if (g_ctx == NULL)
         return STATUS_FATAL_APP_EXIT;
@@ -177,18 +166,8 @@ NTSTATUS WINAPI ucmMain(
 * Program entry point.
 *
 */
-#pragma comment(linker, "/ENTRY:main")
-VOID __cdecl main()
+int __cdecl main()
 {
-#ifdef _UCM_CONSOLE
-    ULONG result;
-
-    result = StubInit(ucmMain);
+    NTSTATUS result = ucmMain(UacMethodInvalid, NULL, 0);
     ucmConsolePrintValueUlong(TEXT("[+] ucmMain"), result, TRUE);
-    ucmConsoleRelease();
-    ExitProcess(result);
-
-#else
-    ExitProcess(StubInit(ucmMain));
-#endif
 }

