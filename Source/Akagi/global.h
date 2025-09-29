@@ -22,8 +22,6 @@
 #error ANSI build is not supported
 #endif
 
-#include "shared\libinc.h"
-
 //disable nonmeaningful warnings.
 #pragma warning(disable: 4005) // macro redefinition
 #pragma warning(disable: 4055) // %s : from data pointer %s to function pointer %s
