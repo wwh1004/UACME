@@ -399,7 +399,7 @@ NTSTATUS ucmxCreateProcessFromParent(
                         NULL,
                         NULL,
                         FALSE,
-                        CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT,
+                        CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT,
                         NULL,
                         g_ctx->szSystemRoot,
                         (LPSTARTUPINFO)&si,
