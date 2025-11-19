@@ -3918,21 +3918,10 @@ BOOL supConcatenatePaths(
     BOOL TrailingBackslash, LeadingBackslash;
     SIZE_T EndingLength;
 
-    if (Target == NULL || Path == NULL || TargetBufferSize == 0)
-        return FALSE;
+    TargetLength = _strlen(Target);
+    PathLength = _strlen(Path);
 
-    TargetLength = 0;
-    while (Target[TargetLength] != 0 && TargetLength < TargetBufferSize)
-        TargetLength++;
-
-    if (TargetLength >= TargetBufferSize)
-        return FALSE;
-
-    PathLength = 0;
-    while (Path[PathLength] != 0)
-        PathLength++;
-
-    if (TargetLength > 0 && Target[TargetLength - 1] == TEXT('\\')) {
+    if (TargetLength && (*CharPrev(Target, Target + TargetLength) == TEXT('\\'))) {
         TrailingBackslash = TRUE;
         TargetLength--;
     }
@@ -3940,27 +3929,30 @@ BOOL supConcatenatePaths(
         TrailingBackslash = FALSE;
     }
 
-    LeadingBackslash = (Path[0] == TEXT('\\'));
-    if (LeadingBackslash) {
-        Path++;
+    if (Path[0] == TEXT('\\')) {
+        LeadingBackslash = TRUE;
         PathLength--;
     }
-
-    EndingLength = TargetLength + PathLength + ((!LeadingBackslash && !TrailingBackslash) ? 1 : 0) + 1; // +1 for NULL
-
-    if (EndingLength > TargetBufferSize)
-        return FALSE;
-
-    if (!LeadingBackslash && !TrailingBackslash) {
-        Target[TargetLength] = TEXT('\\');
-        TargetLength++;
+    else {
+        LeadingBackslash = FALSE;
     }
 
-    for (SIZE_T i = 0; i < PathLength && (TargetLength + i + 1) < TargetBufferSize; i++) {
-        Target[TargetLength + i] = Path[i];
+    EndingLength = TargetLength + PathLength + 2;
+
+    if (!LeadingBackslash && (TargetLength < TargetBufferSize)) {
+        Target[TargetLength++] = TEXT('\\');
     }
 
-    Target[EndingLength - 1] = 0;
+    if (TargetBufferSize > TargetLength) {
+        _strncpy(Target + TargetLength,
+            TargetBufferSize - TargetLength,
+            Path,
+            TargetBufferSize - TargetLength);
+    }
+
+    if (TargetBufferSize) {
+        Target[TargetBufferSize - 1] = 0;
+    }
 
     return (EndingLength <= TargetBufferSize);
 }
