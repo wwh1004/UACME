@@ -67,8 +67,7 @@ NTSTATUS ucmHakrilMethod(
         //
         // Decrypt and decompress custom Kamikaze snap-in.
         //
-        SnapinData = supLdrQueryResourceData(
-            KAMIKAZE_ID,
+        SnapinData = supLdrQueryResourceKamikaze(
             &SnapinSize);
 
         if (SnapinData == NULL)

@@ -186,6 +186,35 @@ BOOLEAN supSetCheckSumForMappedFile(
     _In_ PVOID BaseAddress,
     _In_ ULONG CheckSum);
 
+typedef PVOID (*PFN_QUERY_RESOURCE)(
+    _Out_ PULONG DataSize
+);
+
+#ifdef _WIN64
+PVOID supLdrQueryResourceAkatsuki64(
+    _Out_ PULONG DataSize
+);
+#endif
+
+PVOID supLdrQueryResourceFubuki32(
+    _Out_ PULONG DataSize
+);
+
+#ifdef _WIN64
+PVOID supLdrQueryResourceFubuki64(
+    _Out_ PULONG DataSize
+);
+#endif
+
+PVOID supLdrQueryResourceKamikaze(
+    _Out_ PULONG DataSize
+);
+
+NTSTATUS supLdrQueryResourceHelper(
+    _Inout_ PULONG DataSize,
+    _Inout_ PVOID* Data
+);
+
 NTSTATUS supLdrQueryResourceDataEx(
     _In_ ULONG_PTR ResourceId,
     _Out_ PULONG DataSize,

@@ -914,6 +914,88 @@ BOOLEAN supSetCheckSumForMappedFile(
     return FALSE;
 }
 
+#ifdef _WIN64
+PVOID supLdrQueryResourceAkatsuki64(
+    _Out_ PULONG DataSize
+)
+{
+    *DataSize = sizeof(g_resourceAkatsuki64);
+    PVOID data = (PVOID)g_resourceAkatsuki64;
+    return NT_SUCCESS(supLdrQueryResourceHelper(DataSize, &data)) ? data : NULL;
+}
+#endif
+
+PVOID supLdrQueryResourceFubuki32(
+    _Out_ PULONG DataSize
+)
+{
+    *DataSize = sizeof(g_resourceFubuki32);
+    PVOID data = (PVOID)g_resourceFubuki32;
+    return NT_SUCCESS(supLdrQueryResourceHelper(DataSize, &data)) ? data : NULL;
+}
+
+#ifdef _WIN64
+PVOID supLdrQueryResourceFubuki64(
+    _Out_ PULONG DataSize
+)
+{
+    *DataSize = sizeof(g_resourceFubuki64);
+    PVOID data = (PVOID)g_resourceFubuki64;
+    return NT_SUCCESS(supLdrQueryResourceHelper(DataSize, &data)) ? data : NULL;
+}
+#endif
+
+PVOID supLdrQueryResourceKamikaze(
+    _Out_ PULONG DataSize
+)
+{
+    *DataSize = sizeof(g_resourceKamikaze);
+    PVOID data = (PVOID)g_resourceKamikaze;
+    return NT_SUCCESS(supLdrQueryResourceHelper(DataSize, &data)) ? data : NULL;
+}
+
+/*
+* supLdrQueryResourceHelper
+* 
+* Purpose:
+* 
+* Load resource by given pointer and size.
+* 
+*/
+NTSTATUS supLdrQueryResourceHelper(
+    _Inout_ PULONG DataSize,
+    _Inout_ PVOID* Data
+)
+{
+    //
+    // Query resource.
+    //
+
+    LPCVOID ResourceData = *Data;
+    ULONG ResourceSize = *DataSize;
+
+    if (!DataSize || !Data)
+        return STATUS_NOT_FOUND;
+
+    //
+    // Allocate memory and copy resource.
+    //
+
+    SIZE_T SizeTemp = ResourceSize;
+    PVOID DataTemp = supVirtualAlloc(&SizeTemp, DEFAULT_ALLOCATION_TYPE, DEFAULT_PROTECT_TYPE, NULL);
+    if (!DataTemp)
+        return STATUS_NO_MEMORY;
+
+    supCopyMemory(DataTemp, SizeTemp, ResourceData, ResourceSize);
+    for (ULONG i = 0; i < min(100, ResourceSize); i++)
+        ((PBYTE)DataTemp)[i] ^= 0xAB;
+
+    *DataSize = ResourceSize;
+    *Data = DataTemp;
+
+    return STATUS_SUCCESS;
+}
+
 /*
 * supLdrQueryResourceDataEx
 *

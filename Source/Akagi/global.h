@@ -44,12 +44,23 @@
 #define FUBUKI32_ID IDR_FUBUKI32
 #define FUBUKI64_ID IDR_FUBUKI64
 #define KAMIKAZE_ID IDR_KAMIKAZE
+
+#define PFN_QUERY_FUBUKI supLdrQueryResourceFubuki64
+#define PFN_QUERY_AKATSUKI supLdrQueryResourceAkatsuki64
+#define PFN_QUERY_FUBUKI32 supLdrQueryResourceFubuki32
+#define PFN_QUERY_FUBUKI64 supLdrQueryResourceFubuki64
+#define PFN_QUERY_KAMIKAZE supLdrQueryResourceKamikaze
 #else
 #include "bin32res.h"
 #define FUBUKI_ID IDR_FUBUKI32
 #define AKATSUKI_ID PAYLOAD_ID_NONE //this module unavailable for 32 bit
 #define FUBUKI32_ID IDR_FUBUKI32
 #define KAMIKAZE_ID IDR_KAMIKAZE
+
+#define PFN_QUERY_FUBUKI supLdrQueryResourceFubuki32
+#define PFN_QUERY_AKATSUKI NULL //this module unavailable for 32 bit
+#define PFN_QUERY_FUBUKI32 supLdrQueryResourceFubuki32
+#define PFN_QUERY_KAMIKAZE supLdrQueryResourceKamikaze
 #endif
 
 #include <Windows.h>
